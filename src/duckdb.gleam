@@ -1,34 +1,39 @@
 import gleam/dynamic.{type Dynamic}
 import gleam/dynamic/decode.{type Decoder}
-import gleam/io
 import gleam/list
 import gleam/result
-
-pub fn main() {
-  let row_decoder = {
-    use i <- decode.field(0, decode.int)
-    use s <- decode.field(1, decode.string)
-    decode.success(#(i, s))
-  }
-  use conn <- with_connection("")
-  let assert Ok(_) =
-    query("CREATE OR REPLACE TABLE test (i INTEGER, s STRING)")
-    |> execute(conn)
-  let assert Ok(_) =
-    query("INSERT INTO test VALUES (42, 'hello!')")
-    |> execute(conn)
-  let assert Ok([#(42, "hello!")]) =
-    query("SELECT * FROM test")
-    |> returning(row_decoder)
-    |> execute(conn)
-    |> io.debug
-}
 
 pub type Database
 
 pub type Connection
 
 pub type Value
+
+@external(erlang, "duckdb_ffi", "null")
+pub fn null() -> Value
+
+@external(erlang, "duckdb_ffi", "coerce")
+pub fn bool(a: Bool) -> Value
+
+@external(erlang, "duckdb_ffi", "coerce")
+pub fn int(a: Int) -> Value
+
+@external(erlang, "duckdb_ffi", "coerce")
+pub fn float(a: Float) -> Value
+
+@external(erlang, "duckdb_ffi", "coerce")
+pub fn text(a: String) -> Value
+
+@external(erlang, "duckdb_ffi", "coerce")
+pub fn bytea(a: BitArray) -> Value
+
+pub fn array(converter: fn(a) -> Value, values: List(a)) -> Value {
+  list.map(values, converter)
+  |> coerce_value
+}
+
+@external(erlang, "duckdb_ffi", "coerce")
+fn coerce_value(a: anything) -> Value
 
 pub type DuckDbError {
   DuckDbError(message: String)
@@ -51,16 +56,21 @@ pub fn run_query(
 ) -> Result(List(Dynamic), DuckDbError)
 
 pub opaque type Query(row_type) {
-  Query(sql: String, row_decoder: Decoder(row_type))
+  Query(sql: String, parameters: List(Value), row_decoder: Decoder(row_type))
 }
 
 pub fn query(sql: String) -> Query(Nil) {
-  Query(sql:, row_decoder: decode.success(Nil))
+  Query(sql:, parameters: [], row_decoder: decode.success(Nil))
 }
 
 pub fn returning(query: Query(a), decoder: Decoder(b)) -> Query(b) {
-  let Query(sql:, row_decoder: _) = query
-  Query(sql:, row_decoder: decoder)
+  let Query(sql:, parameters:, row_decoder: _) = query
+  Query(sql:, parameters:, row_decoder: decoder)
+}
+
+/// Push a new query parameter value for the query.
+pub fn parameter(query: Query(a), parameter: Value) -> Query(a) {
+  Query(..query, parameters: [parameter, ..query.parameters])
 }
 
 pub fn execute(
