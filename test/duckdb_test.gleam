@@ -27,4 +27,18 @@ pub fn simple_test() {
   |> duckdb.returning(row_decoder)
   |> duckdb.execute(conn)
   |> should.equal(Ok([#(42, "hello!")]))
+
+  duckdb.query("SELECT * FROM test WHERE i = $1 AND s = $2")
+  |> duckdb.parameter(duckdb.int(42))
+  |> duckdb.parameter(duckdb.varchar("hello!"))
+  |> duckdb.returning(row_decoder)
+  |> duckdb.execute(conn)
+  |> should.equal(Ok([#(42, "hello!")]))
+
+  duckdb.query("SELECT * FROM test WHERE i = $1 AND s = $2")
+  |> duckdb.parameter(duckdb.int(42))
+  |> duckdb.parameter(duckdb.varchar("goodbye!"))
+  |> duckdb.returning(row_decoder)
+  |> duckdb.execute(conn)
+  |> should.equal(Ok([]))
 }
