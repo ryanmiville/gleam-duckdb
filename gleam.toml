@@ -14,7 +14,7 @@ version = "1.0.0"
 
 [dependencies]
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"
-educkdb = ">= 0.8.4 and < 1.0.0"
+educkdb = ">= 0.9.8 and < 1.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
