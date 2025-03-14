@@ -2,12 +2,12 @@
 # You typically do not need to edit this file
 
 packages = [
-  { name = "educkdb", version = "0.9.8", build_tools = ["rebar3"], requirements = [], otp_app = "educkdb", source = "hex", outer_checksum = "4AEB9C4ADF8AEAC76AF74273A0C5A6CF00B69B26D02E31FD7FBD2FA0C1FFC570" },
+  { name = "educkdb", version = "0.9.10", build_tools = ["rebar3"], requirements = [], otp_app = "educkdb", source = "hex", outer_checksum = "B48734C31FFE5F382F6BF7F695083178E25AA4233BB3FDB8BC365D1A23F93C51" },
   { name = "gleam_stdlib", version = "0.51.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "14AFA8D3DDD7045203D422715DBB822D1725992A31DF35A08D97389014B74B68" },
   { name = "gleeunit", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleeunit", source = "hex", outer_checksum = "F7A7228925D3EE7D0813C922E062BFD6D7E9310F0BEE585D3A42F3307E3CFD13" },
 ]
 
 [requirements]
-educkdb = { version = ">= 0.9.8 and < 1.0.0" }
+educkdb = { version = ">= 0.9.10 and < 1.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
